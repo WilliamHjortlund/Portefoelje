@@ -110,19 +110,44 @@ void Menu::adventureLoop(Character& character) {
 
         Monster enemy = chooseFightMonster();
 
-        std::cout << "\nVælg dit monster til kampen:\n";
-        character.printMonsters();
-        int monsterChoice = readInt("Valg (nummer): ", 1, character.getMonsterCount());
-        Monster* myMonster = character.getMonster(monsterChoice - 1);
+        bool battleWon = false;
+        while (!battleWon && character.hasAliveMonsters()) {
+            std::cout << "\nVælg dit monster til kampen:\n";
+            character.printMonsters();
+            int monsterChoice = readInt("Valg (nummer): ", 1, character.getMonsterCount());
+            Monster* myMonster = character.getMonster(monsterChoice - 1);
 
-        bool won = Combat::fight(*myMonster, enemy);
+            bool won = Combat::fight(*myMonster, enemy);
 
-        if (won) {
-            std::cout << "\nDu besejrede " << enemy.getName() << "!\n";
-            enemy.resetHp();
-            offerCapturedMonster(character, enemy);
-        } else {
-            std::cout << "\nDit monster " << myMonster->getName() << " er ude af kamp.\n";
+            if (won) {
+                std::cout << "\nDu besejrede " << enemy.getName() << "!\n";
+                enemy.resetHp();
+                offerCapturedMonster(character, enemy);
+                battleWon = true;
+            } else {
+                std::cout << "\nDit monster " << myMonster->getName() << " er ude af kamp.\n";
+                
+                // Check om der er andre levende monstre
+                int aliveCount = 0;
+                for (int i = 0; i < character.getMonsterCount(); i++) {
+                    if (character.getMonster(i)->isAlive()) {
+                        aliveCount++;
+                    }
+                }
+                
+                if (aliveCount > 0) {
+                    std::cout << "Du har " << aliveCount << " levende monster(e) tilbage.\n";
+                    std::cout << "Vil du sende et nyt monster mod " << enemy.getName() << "? (1=Ja / 2=Nej): ";
+                    int choice = readInt("", 1, 2);
+                    if (choice == 2) {
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (!battleWon && !character.hasAliveMonsters()) {
+            std::cout << "\nAlle dine monstre er besejret!\n";
         }
     }
 }
