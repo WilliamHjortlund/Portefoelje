@@ -37,9 +37,6 @@ std::vector<Monster> Menu::buildEnemyPool() {
         Monster("Goblin",    20,  6),
         Monster("Troll",     40, 10),
         Monster("Drage",     60, 15),
-        Monster("Orc",       35,  8),
-        Monster("Vampire",   45, 12),
-        Monster("Spaeghost", 10,  4),
     };
 }
 
@@ -101,7 +98,7 @@ void Menu::adventureLoop(Character& character) {
         std::cout << "  EVENTYR - Karakter: " << character.getName() << "\n";
         printSeparator();
         character.printMonsters();
-        std::cout << "\n  1. Kaempmod en fjende\n";
+        std::cout << "\n  1. Kæmp mod en fjende\n";
         std::cout << "  2. Forlad til hovedmenu\n";
         printSeparator();
 
@@ -113,7 +110,7 @@ void Menu::adventureLoop(Character& character) {
 
         Monster enemy = chooseFightMonster();
 
-        std::cout << "\nVaelg dit monster til kampen:\n";
+        std::cout << "\nVælg dit monster til kampen:\n";
         character.printMonsters();
         int monsterChoice = readInt("Valg (nummer): ", 1, character.getMonsterCount());
         Monster* myMonster = character.getMonster(monsterChoice - 1);
@@ -122,6 +119,7 @@ void Menu::adventureLoop(Character& character) {
 
         if (won) {
             std::cout << "\nDu besejrede " << enemy.getName() << "!\n";
+            enemy.resetHp();
             offerCapturedMonster(character, enemy);
         } else {
             std::cout << "\nDit monster " << myMonster->getName() << " er ude af kamp.\n";
@@ -132,7 +130,7 @@ void Menu::adventureLoop(Character& character) {
 Monster Menu::chooseFightMonster() {
     std::vector<Monster> pool = buildEnemyPool();
 
-    std::cout << "\nVaelg hvilken fjende du vil kaempe mod:\n";
+    std::cout << "\nVælg hvilken fjende du vil kæmpe mod:\n";
     for (int i = 0; i < (int)pool.size(); i++) {
         std::cout << "  " << (i + 1) << ". ";
         pool[i].printStats();
@@ -143,21 +141,21 @@ Monster Menu::chooseFightMonster() {
 }
 
 bool Menu::offerCapturedMonster(Character& character, const Monster& captured) {
-    std::cout << "\nVil du tilfoeje " << captured.getName()
+    std::cout << "\nVil du tilføje " << captured.getName()
               << " til dit hold? (1=Ja / 2=Nej): ";
     int choice = readInt("", 1, 2);
     if (choice == 2) return false;
 
     if (character.getMonsterCount() < MAX_MONSTERS) {
         character.addMonster(captured);
-        std::cout << captured.getName() << " er tilfoejt til dit hold!\n";
+        std::cout << captured.getName() << " er tilføjet til dit hold!\n";
     } else {
         std::cout << "Dit hold er fuldt (" << MAX_MONSTERS << "/" << MAX_MONSTERS << ").\n";
         std::cout << "Vil du udskifte et monster? (1=Ja / 2=Nej): ";
         int replace = readInt("", 1, 2);
         if (replace == 2) return false;
 
-        std::cout << "\nVaelg hvilket monster du vil udskifte:\n";
+        std::cout << "\nVælg hvilket monster du vil udskifte:\n";
         character.printMonsters();
         int idx = readInt("Nummer: ", 1, character.getMonsterCount());
         character.replaceMonster(idx - 1, captured);

@@ -17,6 +17,10 @@ void Monster::takeDamage(int damage) {
     hp = std::max(0, hp - damage);
 }
 
+void Monster::resetHp() {
+    hp = maxHp;
+}
+
 void Monster::printStats() const {
     std::cout << "  [" << name << "] HP: " << hp << "/" << maxHp
               << "  Styrke: " << strength << "\n";

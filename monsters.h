@@ -11,6 +11,7 @@ public:
     int getStrength() const;
     bool isAlive() const;
     void takeDamage(int damage);
+    void resetHp();
     void printStats() const;
 
 private:
