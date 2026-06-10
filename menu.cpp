@@ -92,8 +92,6 @@ void Menu::adventureLoop(Character& character) {
             return;
         }
 
-        character.removeDefeatedMonsters();
-
         printSeparator();
         std::cout << "  EVENTYR - Karakter: " << character.getName() << "\n";
         printSeparator();
@@ -111,11 +109,25 @@ void Menu::adventureLoop(Character& character) {
         Monster enemy = chooseFightMonster();
 
         bool battleWon = false;
+        bool isFirstMonster = true;
+
         while (!battleWon && character.hasAliveMonsters()) {
-            std::cout << "\nVælg dit monster til kampen:\n";
+            if (isFirstMonster) {
+                std::cout << "\nVælg dit monster til kampen mod " << enemy.getName() << ":\n";
+                isFirstMonster = false;
+            } else {
+                std::cout << "\nVælg næste monster til kampen mod " << enemy.getName() << ":\n";
+            }
+            
             character.printMonsters();
             int monsterChoice = readInt("Valg (nummer): ", 1, character.getMonsterCount());
             Monster* myMonster = character.getMonster(monsterChoice - 1);
+
+            // Tjek at monsteret er i live
+            if (!myMonster->isAlive()) {
+                std::cout << "Dit monster " << myMonster->getName() << " er allerede besejret!\n";
+                continue;
+            }
 
             bool won = Combat::fight(*myMonster, enemy);
 
@@ -127,7 +139,7 @@ void Menu::adventureLoop(Character& character) {
             } else {
                 std::cout << "\nDit monster " << myMonster->getName() << " er ude af kamp.\n";
                 
-                // Check om der er andre levende monstre
+                // Tæl levende monstre
                 int aliveCount = 0;
                 for (int i = 0; i < character.getMonsterCount(); i++) {
                     if (character.getMonster(i)->isAlive()) {
@@ -137,18 +149,14 @@ void Menu::adventureLoop(Character& character) {
                 
                 if (aliveCount > 0) {
                     std::cout << "Du har " << aliveCount << " levende monster(e) tilbage.\n";
-                    std::cout << "Vil du sende et nyt monster mod " << enemy.getName() << "? (1=Ja / 2=Nej): ";
-                    int choice = readInt("", 1, 2);
-                    if (choice == 2) {
-                        break;
-                    }
+                    std::cout << "Fjenden er stadig i live med " << enemy.getHp() << " HP.\n";
                 }
             }
         }
         
-        if (!battleWon && !character.hasAliveMonsters()) {
-            std::cout << "\nAlle dine monstre er besejret!\n";
-        }
+        // Nulstil alle monstre, så vinder får fuld HP, og fjern derefter de døde
+        character.resetAllMonstersHp();
+        character.removeDefeatedMonsters();
     }
 }
 

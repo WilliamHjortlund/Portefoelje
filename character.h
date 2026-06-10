@@ -17,6 +17,7 @@ public:
     bool addMonster(const Monster& monster);
     bool replaceMonster(int index, const Monster& monster);
     void removeDefeatedMonsters();
+    void resetAllMonstersHp();
 
     void printMonsters() const;
 

@@ -48,6 +48,12 @@ void Character::removeDefeatedMonsters() {
     monsterCount = newCount;
 }
 
+void Character::resetAllMonstersHp() {
+    for (int i = 0; i < monsterCount; i++) {
+        monsters[i].resetHp();
+    }
+}
+
 void Character::printMonsters() const {
     std::cout << "Karakterens monstre (" << monsterCount << "/" << MAX_MONSTERS << "):\n";
     for (int i = 0; i < monsterCount; i++) {
