@@ -1,6 +1,7 @@
 #include "character.h"
 #include <iostream>
 
+
 Character::Character(const std::string& name)
     : name(name), monsterCount(0)
 {

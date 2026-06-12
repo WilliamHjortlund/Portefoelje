@@ -19,3 +19,4 @@ add_executable(monster_spil
 
 # Include directories (if needed for headers)
 target_include_directories(monster_spil PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+

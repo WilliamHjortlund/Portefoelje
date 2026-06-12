@@ -3,6 +3,7 @@
 #include <string>
 #include <array>
 
+
 constexpr int MAX_MONSTERS = 4;
 
 class Character {
