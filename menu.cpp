@@ -369,4 +369,5 @@ void Menu::handleCaveReward(Character& character, const std::vector<Item>& rewar
             std::cout << item.getName() << " er givet til " << monster->getName() << "!\n";
         }
     }
+    character.resetAllMonstersHp();
 }
