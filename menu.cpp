@@ -106,23 +106,18 @@ void Menu::adventureLoop(Character& character) {
         printSeparator();
         character.printMonsters();
         std::cout << "\n  1. Kæmp mod en fjende\n";
-        std::cout << "  2. Giv item til monster\n";
-        std::cout << "  3. Gå til grotte\n";
-        std::cout << "  4. Forlad til hovedmenu\n";
+        std::cout << "  2. Gå til grotte\n";
+        std::cout << "  3. Forlad til hovedmenu\n";
         printSeparator();
 
-        int choice = readInt("Valg: ", 1, 4);
-        if (choice == 4) {
+        int choice = readInt("Valg: ", 1, 3);
+        if (choice == 3) {
             std::cout << "Du vender tilbage til hovedmenuen.\n";
             return;
         }
 
-        if (choice == 2) {
-            giveItemToMonster(character);
-            continue;
-        }
 
-        if (choice == 3) {
+        if (choice == 2) {
             caveAdventure(character);
             continue;
         }
