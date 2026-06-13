@@ -40,6 +40,14 @@ std::vector<Monster> Menu::buildEnemyPool() {
     };
 }
 
+std::vector<Item> Menu::buildItemPool() {
+    return {
+        Item("Sværd", ItemType::STRENGTH_BOOST, 5),
+        Item("Energidrik", ItemType::HEALTH_BOOST, 10),
+        Item("Skjold", ItemType::DEFENSE_BOOST, 3),
+    };
+}
+
 void Menu::run() {
     std::srand(static_cast<unsigned>(std::time(nullptr)));
     showMainMenu();
@@ -97,13 +105,19 @@ void Menu::adventureLoop(Character& character) {
         printSeparator();
         character.printMonsters();
         std::cout << "\n  1. Kæmp mod en fjende\n";
-        std::cout << "  2. Forlad til hovedmenu\n";
+        std::cout << "  2. Giv item til monster\n";
+        std::cout << "  3. Forlad til hovedmenu\n";
         printSeparator();
 
-        int choice = readInt("Valg: ", 1, 2);
-        if (choice == 2) {
+        int choice = readInt("Valg: ", 1, 3);
+        if (choice == 3) {
             std::cout << "Du vender tilbage til hovedmenuen.\n";
             return;
+        }
+
+        if (choice == 2) {
+            giveItemToMonster(character);
+            continue;
         }
 
         Monster enemy = chooseFightMonster();
@@ -195,4 +209,45 @@ bool Menu::offerCapturedMonster(Character& character, const Monster& captured) {
         std::cout << "Monster udskiftet med " << captured.getName() << "!\n";
     }
     return true;
+}
+
+void Menu::equipMonsterWithItems(Monster& monster) {
+    std::vector<Item> items = buildItemPool();
+    
+    printSeparator();
+    std::cout << "Vælg powerups til " << monster.getName() << ":\n";
+    printSeparator();
+    
+    while (true) {
+        std::cout << "\nTilgængelige items:\n";
+        for (int i = 0; i < (int)items.size(); i++) {
+            std::cout << "  " << (i + 1) << ". ";
+            items[i].printInfo();
+        }
+        std::cout << "  " << (items.size() + 1) << ". Start kampen\n";
+        printSeparator();
+        
+        int choice = readInt("Valg: ", 1, (int)items.size() + 1);
+        
+        if (choice == (int)items.size() + 1) {
+            break;
+        }
+        
+        monster.equipItem(items[choice - 1]);
+        std::cout << items[choice - 1].getName() << " er givet til " << monster.getName() << "!\n";
+    }
+}
+
+void Menu::giveItemToMonster(Character& character) {
+    std::cout << "\nVælg hvilket monster skal få et item:\n";
+    character.printMonsters();
+    int monsterChoice = readInt("Valg (nummer): ", 1, character.getMonsterCount());
+    Monster* monster = character.getMonster(monsterChoice - 1);
+    
+    if (monster == nullptr) {
+        std::cout << "Ugyldigt valg!\n";
+        return;
+    }
+    
+    equipMonsterWithItems(*monster);
 }
