@@ -5,7 +5,7 @@
 
 class Caves {
 public:
-    static Monster generateCaveMonster();
+    static std::vector<Monster> generateCaveGroup();
     static std::vector<Item> getItemReward();
     static void printCaveInfo();
 };
