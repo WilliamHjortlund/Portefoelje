@@ -1,13 +1,49 @@
 #include "caves.h"
 #include <iostream>
 #include <random>
+#include <algorithm>
 
-std::vector<Monster> Caves::generateCaveGroup() {
-    return {
-        Monster("Skelet Kriger", 25,  7),
-        Monster("Undead Mage",   20, 10),
-        Monster("Grotte Drage",  35,  9),
+std::vector<Monster> Caves::generateCaveGroup(const Character& character) {
+    // Beregn gennemsnitlig styrke og HP på spillerens levende monstre
+    int totalStrength = 0;
+    int totalHp = 0;
+    int count = 0;
+
+    for (int i = 0; i < character.getMonsterCount(); i++) {
+        // getMonster er ikke-const, så vi caster
+        Monster* m = const_cast<Character&>(character).getMonster(i);
+        if (m && m->isAlive()) {
+            totalStrength += m->getStrength();
+            totalHp       += m->getBaseHp();
+            count++;
+        }
+    }
+
+    if (count == 0) {
+        totalStrength = 5;
+        totalHp       = 30;
+        count         = 1;
+    }
+
+    int avgStr = totalStrength / count;
+    int avgHp  = totalHp / count;
+
+    // Tre fjender: svag → middel → stærk (80% / 100% / 120% af spillerniveau)
+    // HP og styrke er minimum 5/10 så fjender aldrig er trivielle
+    struct EnemyDef { std::string name; double strMult; double hpMult; };
+    std::vector<EnemyDef> defs = {
+        { "Skelet Kriger", 0.8, 0.8 },
+        { "Undead Mage",   1.0, 0.7 },  // lidt mere styrke, lidt mindre HP
+        { "Grotte Drage",  1.2, 1.2 },
     };
+
+    std::vector<Monster> group;
+    for (const auto& def : defs) {
+        int str = std::max(5,  (int)(avgStr * def.strMult));
+        int hp  = std::max(10, (int)(avgHp  * def.hpMult));
+        group.emplace_back(def.name, hp, str);
+    }
+    return group;
 }
 
 std::vector<Item> Caves::getItemReward() {

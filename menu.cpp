@@ -259,7 +259,7 @@ void Menu::caveAdventure(Character& character) {
 
     Caves::printCaveInfo();
 
-    std::vector<Monster> enemies = Caves::generateCaveGroup();
+    std::vector<Monster> enemies = Caves::generateCaveGroup(character);
     int totalEnemies = (int)enemies.size();
 
     for (int i = 0; i < character.getMonsterCount(); i++) {
