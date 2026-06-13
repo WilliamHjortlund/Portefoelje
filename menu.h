@@ -1,6 +1,7 @@
 #pragma once
 #include "character.h"
 #include "item.h"
+#include "caves.h"
 #include <vector>
 
 class Menu {
@@ -17,6 +18,8 @@ private:
     bool offerCapturedMonster(Character& character, const Monster& captured);
     void equipMonsterWithItems(Monster& monster);
     void giveItemToMonster(Character& character);
+    void caveAdventure(Character& character);
+    void handleCaveReward(Character& character, const std::vector<Item>& rewards);
 
     static std::vector<Monster> buildEnemyPool();
     static std::vector<Item> buildItemPool();

@@ -106,17 +106,23 @@ void Menu::adventureLoop(Character& character) {
         character.printMonsters();
         std::cout << "\n  1. Kæmp mod en fjende\n";
         std::cout << "  2. Giv item til monster\n";
-        std::cout << "  3. Forlad til hovedmenu\n";
+        std::cout << "  3. Gå til grotte\n";
+        std::cout << "  4. Forlad til hovedmenu\n";
         printSeparator();
 
-        int choice = readInt("Valg: ", 1, 3);
-        if (choice == 3) {
+        int choice = readInt("Valg: ", 1, 4);
+        if (choice == 4) {
             std::cout << "Du vender tilbage til hovedmenuen.\n";
             return;
         }
 
         if (choice == 2) {
             giveItemToMonster(character);
+            continue;
+        }
+
+        if (choice == 3) {
+            caveAdventure(character);
             continue;
         }
 
@@ -250,4 +256,110 @@ void Menu::giveItemToMonster(Character& character) {
     }
     
     equipMonsterWithItems(*monster);
+}
+
+void Menu::caveAdventure(Character& character) {
+    if (!character.hasAliveMonsters()) {
+        std::cout << "\nDu har ingen levende monstre! Gå tilbage til hovedmenuen.\n";
+        return;
+    }
+
+    Caves::printCaveInfo();
+    
+    // Generer grottemonster
+    Monster caveMonster = Caves::generateCaveMonster();
+    std::cout << "\nDu møder " << caveMonster.getName() << " i grottens dybde!\n";
+    delay(1000);
+
+    // Resettet alle karakterens monstre til max HP
+    for (int i = 0; i < character.getMonsterCount(); i++) {
+        Monster* monster = character.getMonster(i);
+        if (monster != nullptr) {
+            monster->resetHp();
+        }
+    }
+
+    bool battleWon = false;
+    bool isFirstMonster = true;
+
+    while (!battleWon && character.hasAliveMonsters()) {
+        if (isFirstMonster) {
+            std::cout << "\nVælg dit monster til grottekampen mod " << caveMonster.getName() << ":\n";
+            isFirstMonster = false;
+        } else {
+            std::cout << "\nVælg næste monster til grottekampen mod " << caveMonster.getName() << ":\n";
+        }
+        
+        character.printMonsters();
+        int monsterChoice = readInt("Valg (nummer): ", 1, character.getMonsterCount());
+        Monster* myMonster = character.getMonster(monsterChoice - 1);
+
+        if (myMonster == nullptr || !myMonster->isAlive()) {
+            std::cout << "Dit monster er ikke i live!\n";
+            continue;
+        }
+
+        bool won = Combat::fight(*myMonster, caveMonster);
+
+        if (won) {
+            std::cout << "\n*** Du sejrede i grottekampen! ***\n";
+            std::vector<Item> rewards = Caves::getItemReward();
+            handleCaveReward(character, rewards);
+            battleWon = true;
+        } else {
+            std::cout << "\n*** Dit monster " << myMonster->getName() << " blev besejret. ***\n";
+            
+            // Tæl levende monstre
+            int aliveCount = 0;
+            for (int i = 0; i < character.getMonsterCount(); i++) {
+                if (character.getMonster(i)->isAlive()) {
+                    aliveCount++;
+                }
+            }
+            
+            if (aliveCount > 0) {
+                std::cout << "Du har " << aliveCount << " levende monster(e) tilbage.\n";
+                std::cout << "Fjenden er stadig i live med " << caveMonster.getHp() << " HP.\n";
+                std::cout << "Vil du sende et nyt monster mod " << caveMonster.getName() << "? (1=Ja / 2=Nej): ";
+                int choice = readInt("", 1, 2);
+                if (choice == 2) {
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (!battleWon && !character.hasAliveMonsters()) {
+        std::cout << "\nAlle dine monstre er besejret i grottekampen!\n";
+    }
+}
+
+void Menu::handleCaveReward(Character& character, const std::vector<Item>& rewards) {
+    printSeparator();
+    std::cout << "\nDu fik følgende items fra grottekampen:\n";
+    for (const auto& item : rewards) {
+        std::cout << "  - ";
+        item.printInfo();
+    }
+    printSeparator();
+
+    std::cout << "\nVil du give disse items til dine monstre? (1=Ja / 2=Nej): ";
+    int choice = readInt("", 1, 2);
+    
+    if (choice == 2) {
+        std::cout << "Du forkastede items og fortsatte.\n";
+        return;
+    }
+
+    for (const auto& item : rewards) {
+        std::cout << "\nVælg hvilket monster skal få " << item.getName() << ":\n";
+        character.printMonsters();
+        int monsterChoice = readInt("Valg (nummer): ", 1, character.getMonsterCount());
+        Monster* monster = character.getMonster(monsterChoice - 1);
+        
+        if (monster != nullptr) {
+            monster->equipItem(item);
+            std::cout << item.getName() << " er givet til " << monster->getName() << "!\n";
+        }
+    }
 }

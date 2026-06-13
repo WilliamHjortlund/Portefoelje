@@ -16,6 +16,7 @@ add_executable(monster_spil
     combat.cpp
     menu.cpp
     item.cpp
+    caves.cpp
 )
 
 # Include directories (if needed for headers)
