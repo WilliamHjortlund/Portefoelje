@@ -4,16 +4,19 @@
 #include <algorithm>
 
 Monster::Monster(const std::string& name, int hp, int strength)
-    : name(name), hp(hp), maxHp(hp), strength(strength), baseStrength(strength), baseHp(hp) {}
+    : name(name), hp(hp), maxHp(hp), strength(strength),
+      baseStrength(strength), baseHp(hp), defense(0), activeStatusEffect(StatusEffect::NONE) {}
 
 Monster::Monster()
-    : name("Hest"), hp(30), maxHp(30), strength(5), baseStrength(5), baseHp(30) {}
+    : name("Hest"), hp(30), maxHp(30), strength(5),
+      baseStrength(5), baseHp(30), defense(0), activeStatusEffect(StatusEffect::NONE) {}
 
 std::string Monster::getName() const { return name; }
 int Monster::getHp() const { return hp; }
 int Monster::getStrength() const { return strength; }
 int Monster::getBaseStrength() const { return baseStrength; }
 int Monster::getBaseHp() const { return baseHp; }
+int Monster::getDefense() const { return defense; }
 bool Monster::isAlive() const { return hp > 0; }
 
 void Monster::takeDamage(int damage) {
@@ -35,7 +38,9 @@ void Monster::printStats() const {
         itemInfo += "]";
     }
     std::cout << "  [" << name << "] HP: " << hp << "/" << maxHp
-              << "  Styrke: " << strength << itemInfo << "\n";
+              << "  Styrke: " << strength
+              << "  Forsvar: " << defense
+              << itemInfo << "\n";
 }
 
 void Monster::equipItem(const Item& item) {
@@ -48,19 +53,35 @@ void Monster::clearItems() {
     strength = baseStrength;
     maxHp = baseHp;
     hp = maxHp;
+    defense = 0;
+    activeStatusEffect = StatusEffect::NONE;
+}
+
+StatusEffect Monster::getStatusEffect() const {
+    for (const auto& item : equippedItems) {
+        if (item.getType() == ItemType::STATUS_EFFECT) {
+            return item.getStatusEffect();
+        }
+    }
+    return StatusEffect::NONE;
+}
+
+bool Monster::hasStatusEffect(StatusEffect effect) const {
+    return getStatusEffect() == effect;
 }
 
 void Monster::recalculateStats() {
     strength = baseStrength;
     maxHp = baseHp;
-    
+    defense = 0;
     for (const auto& item : equippedItems) {
         if (item.getType() == ItemType::STRENGTH_BOOST) {
             strength += item.getBonus();
         } else if (item.getType() == ItemType::HEALTH_BOOST) {
             maxHp += item.getBonus();
+        } else if (item.getType() == ItemType::DEFENSE_BOOST) {
+            defense += item.getBonus();
         }
     }
-    
     hp = maxHp;
 }

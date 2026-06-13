@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "item.h"
+#include "status.h"
 
 class Monster {
 public:
@@ -13,6 +14,7 @@ public:
     int getStrength() const;
     int getBaseStrength() const;
     int getBaseHp() const;
+    int getDefense() const;
     bool isAlive() const;
     void takeDamage(int damage);
     void resetHp();
@@ -20,6 +22,9 @@ public:
     
     void equipItem(const Item& item);
     void clearItems();
+    
+    StatusEffect getStatusEffect() const;
+    bool hasStatusEffect(StatusEffect effect) const;
 
 private:
     std::string name;
@@ -28,7 +33,9 @@ private:
     int strength;
     int baseStrength;
     int baseHp;
+    int defense;
     std::vector<Item> equippedItems;
+    StatusEffect activeStatusEffect;
     
     void recalculateStats();
 };

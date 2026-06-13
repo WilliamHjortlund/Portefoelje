@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(monster_spil)
 
-# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 
-# Add executable
 add_executable(monster_spil
     main.cpp
     character.cpp
@@ -17,8 +14,11 @@ add_executable(monster_spil
     menu.cpp
     item.cpp
     caves.cpp
+    status.cpp
 )
 
-# Include directories (if needed for headers)
 target_include_directories(monster_spil PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
+# Link med threads for std::this_thread::sleep_for på Linux
+find_package(Threads REQUIRED)
+target_link_libraries(monster_spil Threads::Threads)

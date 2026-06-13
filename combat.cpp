@@ -19,48 +19,54 @@ bool Combat::fight(Monster& playerMonster, Monster& enemyMonster) {
     std::cout << "\n";
     delay(1000);
 
-    // Tilfældig bestemmelse af hvem der starter
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 1);
-    
-    bool playerStarts = dis(gen) == 0;
-    
-    if (playerStarts) {
-        std::cout << "Dit monster angriber først!\n";
+    bool playerStarts;
+
+    if (playerMonster.hasStatusEffect(StatusEffect::SPEED_II)) {
+        playerStarts = true;
+        std::cout << playerMonster.getName() << " har Hurtighed II og angriber altid først!\n";
+    } else if (enemyMonster.hasStatusEffect(StatusEffect::SPEED_II)) {
+        playerStarts = false;
+        std::cout << enemyMonster.getName() << " har Hurtighed II og angriber altid først!\n";
     } else {
-        std::cout << "Fjendens monster angriber først!\n";
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, 1);
+        playerStarts = dis(gen) == 0;
+        if (playerStarts) {
+            std::cout << "Dit monster angriber først!\n";
+        } else {
+            std::cout << "Fjendens monster angriber først!\n";
+        }
     }
+
     delay(1000);
 
     while (playerMonster.isAlive() && enemyMonster.isAlive()) {
         if (playerStarts) {
-            int dmg = playerMonster.getStrength();
+            int dmg = std::max(1, playerMonster.getStrength() - enemyMonster.getDefense());
             enemyMonster.takeDamage(dmg);
             std::cout << playerMonster.getName() << " angriber "
                       << enemyMonster.getName() << " for " << dmg << " skade! "
                       << "(fjende HP: " << enemyMonster.getHp() << ")\n";
             delay(1000);
-
             if (!enemyMonster.isAlive()) break;
 
-            dmg = enemyMonster.getStrength();
+            dmg = std::max(1, enemyMonster.getStrength() - playerMonster.getDefense());
             playerMonster.takeDamage(dmg);
             std::cout << enemyMonster.getName() << " angriber "
                       << playerMonster.getName() << " for " << dmg << " skade! "
                       << "(dit HP: " << playerMonster.getHp() << ")\n";
             delay(1000);
         } else {
-            int dmg = enemyMonster.getStrength();
+            int dmg = std::max(1, enemyMonster.getStrength() - playerMonster.getDefense());
             playerMonster.takeDamage(dmg);
             std::cout << enemyMonster.getName() << " angriber "
                       << playerMonster.getName() << " for " << dmg << " skade! "
                       << "(dit HP: " << playerMonster.getHp() << ")\n";
             delay(1000);
-
             if (!playerMonster.isAlive()) break;
 
-            dmg = playerMonster.getStrength();
+            dmg = std::max(1, playerMonster.getStrength() - enemyMonster.getDefense());
             enemyMonster.takeDamage(dmg);
             std::cout << playerMonster.getName() << " angriber "
                       << enemyMonster.getName() << " for " << dmg << " skade! "
