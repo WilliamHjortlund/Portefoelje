@@ -16,9 +16,14 @@ public:
 
     bool addMonster(const Monster& monster);
     bool replaceMonster(int index, const Monster& monster);
+    
     void removeDefeatedMonsters();
     void resetAllMonstersHp();
     void clearMonsters();
+
+    void setMonstersDefeated(int value);
+    void setCavesCompleted(int value);
+    void setItemsCollected(int value);
 
     void setName(const std::string& newName);
     void addMonsterDefeat();

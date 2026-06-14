@@ -37,7 +37,10 @@ bool Database::init()
 {
     const char* sql =
         "CREATE TABLE IF NOT EXISTS character ("
-        "name TEXT PRIMARY KEY);"
+        "name TEXT PRIMARY KEY,"
+        "monsters_defeated INTEGER DEFAULT 0,"
+        "caves_completed INTEGER DEFAULT 0,"
+        "items_collected INTEGER DEFAULT 0);"
 
         "CREATE TABLE IF NOT EXISTS monster ("
         "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -76,16 +79,26 @@ bool Database::saveCharacter(const Character& character)
     std::string deleteItemsSql =
         "DELETE FROM monster_item WHERE character_name='" +
         character.getName() + "';";
-    
+
     sqlite3_exec(db, deleteItemsSql.c_str(), nullptr, nullptr, &errMsg);
 
     std::string insertCharacter =
-        "INSERT OR REPLACE INTO character(name) VALUES('" +
-        character.getName() + "');";
+        "INSERT OR REPLACE INTO character("
+        "name,"
+        "monsters_defeated,"
+        "caves_completed,"
+        "items_collected"
+        ") VALUES('" +
+        character.getName() + "'," +
+        std::to_string(character.getMonstersDefeated()) + "," +
+        std::to_string(character.getCavesCompleted()) + "," +
+        std::to_string(character.getItemsCollected()) +
+        ");";
 
     sqlite3_exec(db, insertCharacter.c_str(), nullptr, nullptr, &errMsg);
 
     for (int i = 0; i < character.getMonsterCount(); i++) {
+
         Monster* monster =
             const_cast<Character&>(character).getMonster(i);
 
@@ -99,7 +112,7 @@ bool Database::saveCharacter(const Character& character)
             ");";
 
         sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
-    
+
         for (const auto& item : monster->getItems())
         {
             std::string itemSql =
@@ -113,6 +126,7 @@ bool Database::saveCharacter(const Character& character)
             sqlite3_exec(db, itemSql.c_str(), nullptr, nullptr, &errMsg);
         }
     }
+
     return true;
 }
 
@@ -120,6 +134,34 @@ bool Database::loadCharacter(Character& character)
 {
     character.clearMonsters();
 
+    // LOAD STATISTIK
+    std::string statsSql =
+        "SELECT monsters_defeated, caves_completed, items_collected "
+        "FROM character "
+        "WHERE name='" +
+        character.getName() + "';";
+
+    sqlite3_stmt* statsStmt = nullptr;
+
+    if (sqlite3_prepare_v2(db, statsSql.c_str(), -1,
+                           &statsStmt, nullptr) == SQLITE_OK)
+    {
+        if (sqlite3_step(statsStmt) == SQLITE_ROW)
+        {
+            character.setMonstersDefeated(
+                sqlite3_column_int(statsStmt, 0));
+
+            character.setCavesCompleted(
+                sqlite3_column_int(statsStmt, 1));
+
+            character.setItemsCollected(
+                sqlite3_column_int(statsStmt, 2));
+        }
+    }
+
+    sqlite3_finalize(statsStmt);
+
+    // LOAD MONSTRE
     std::string sql =
         "SELECT name, hp, strength "
         "FROM monster "
@@ -134,10 +176,11 @@ bool Database::loadCharacter(Character& character)
 
     bool foundAny = false;
 
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
         std::string monsterName =
-            reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            reinterpret_cast<const char*>(
+                sqlite3_column_text(stmt, 0));
 
         int hp = sqlite3_column_int(stmt, 1);
         int strength = sqlite3_column_int(stmt, 2);

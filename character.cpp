@@ -143,3 +143,17 @@ void Character::printStatistics() const
     std::cout << "Items fundet:      " << itemsCollected << "\n";
     std::cout << "============================================\n";
 }
+void Character::setMonstersDefeated(int value)
+{
+    monstersDefeated = value;
+}
+
+void Character::setCavesCompleted(int value)
+{
+    cavesCompleted = value;
+}
+
+void Character::setItemsCollected(int value)
+{
+    itemsCollected = value;
+}
