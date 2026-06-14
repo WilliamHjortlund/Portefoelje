@@ -257,7 +257,6 @@ std::vector<std::string> Database::getCharacterNames()
             );
         }
     }
-
     sqlite3_finalize(stmt);
 
     return names;
