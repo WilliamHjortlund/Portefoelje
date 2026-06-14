@@ -15,10 +15,11 @@ add_executable(monster_spil
     item.cpp
     caves.cpp
     status.cpp
+    database.cpp
+    sqlite3.c
 )
 
 target_include_directories(monster_spil PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# Link med threads for std::this_thread::sleep_for på Linux
 find_package(Threads REQUIRED)
 target_link_libraries(monster_spil Threads::Threads)

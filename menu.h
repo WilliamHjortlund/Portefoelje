@@ -11,6 +11,8 @@ public:
 private:
     void showMainMenu();
     void createCharacter();
+    void loadCharacter();
+    void saveCharacter(Character& character);
     void startAdventure(Character& character);
     void adventureLoop(Character& character);
 

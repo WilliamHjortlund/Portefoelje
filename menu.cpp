@@ -1,5 +1,6 @@
 #include "menu.h"
 #include "combat.h"
+#include "database.h"
 #include <iostream>
 #include <limits>
 #include <vector>
@@ -60,13 +61,19 @@ void Menu::showMainMenu() {
         std::cout << "       MONSTER KAMP SPIL - HOVEDMENU\n";
         printSeparator();
         std::cout << "  1. Opret ny karakter og spil\n";
-        std::cout << "  2. Afslut spillet\n";
+        std::cout << "  2. Indlæs karakter\n";
+        std::cout << "  3. Afslut spillet\n";
         printSeparator();
 
-        int choice = readInt("Valg: ", 1, 2);
+        int choice = readInt("Valg: ", 1, 3);
+
         if (choice == 1) {
             createCharacter();
-        } else {
+        }
+        else if (choice == 2) {
+            loadCharacter();
+        }
+        else {
             std::cout << "Farvel!\n";
             return;
         }
@@ -107,11 +114,18 @@ void Menu::adventureLoop(Character& character) {
         character.printMonsters();
         std::cout << "\n  1. Kæmp mod en fjende\n";
         std::cout << "  2. Gå til grotte\n";
-        std::cout << "  3. Forlad til hovedmenu\n";
+        std::cout << "  3. Gem karakter\n";
+        std::cout << "  4. Forlad til hovedmenu\n";
         printSeparator();
 
-        int choice = readInt("Valg: ", 1, 3);
+        int choice = readInt("Valg: ", 1, 4);
+        
         if (choice == 3) {
+            saveCharacter(character);
+            continue;
+        }
+
+        if (choice == 4) {
             std::cout << "Du vender tilbage til hovedmenuen.\n";
             return;
         }
@@ -365,4 +379,43 @@ void Menu::handleCaveReward(Character& character, const std::vector<Item>& rewar
         }
     }
     character.resetAllMonstersHp();
+}
+void Menu::saveCharacter(Character& character)
+{
+    Database db("game.db");
+
+    if (!db.init()) {
+        std::cout << "Kunne ikke oprette database.\n";
+        return;
+    }
+
+    if (db.saveCharacter(character)) {
+        std::cout << "\nSpillet blev gemt!\n";
+    }
+    else {
+        std::cout << "\nFejl ved gemning.\n";
+    }
+}
+
+void Menu::loadCharacter()
+{
+    std::string name =
+        readLine("Navn på karakter der skal indlæses: ");
+
+    Character character(name);
+
+    Database db("game.db");
+
+    if (!db.init()) {
+        std::cout << "Kunne ikke åbne database.\n";
+        return;
+    }
+
+    if (db.loadCharacter(character)) {
+        std::cout << "\nKarakter indlæst!\n";
+        adventureLoop(character);
+    }
+    else {
+        std::cout << "\nKarakter ikke fundet.\n";
+    }
 }
