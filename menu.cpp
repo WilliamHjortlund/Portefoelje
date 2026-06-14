@@ -399,17 +399,39 @@ void Menu::saveCharacter(Character& character)
 
 void Menu::loadCharacter()
 {
-    std::string name =
-        readLine("Navn på karakter der skal indlæses: ");
-
-    Character character(name);
-
     Database db("game.db");
 
     if (!db.init()) {
         std::cout << "Kunne ikke åbne database.\n";
         return;
     }
+
+    auto names = db.getCharacterNames();
+
+    if (names.empty()) {
+        std::cout << "\nIngen gemte karakterer fundet.\n";
+        return;
+    }
+
+    std::cout << "\n============================================\n";
+    std::cout << "         GEMTE KARAKTERER\n";
+    std::cout << "============================================\n";
+
+    for (size_t i = 0; i < names.size(); i++) {
+        std::cout << "  " << i + 1 << ". " << names[i] << "\n";
+    }
+
+    std::cout << "============================================\n";
+
+    int choice = readInt(
+        "Vælg karakter: ",
+        1,
+        static_cast<int>(names.size())
+    );
+
+    std::string name = names[choice - 1];
+
+    Character character(name);
 
     if (db.loadCharacter(character)) {
         std::cout << "\nKarakter indlæst!\n";

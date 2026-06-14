@@ -193,3 +193,29 @@ bool Database::loadCharacter(Character& character)
 
     return foundAny;
 }
+
+std::vector<std::string> Database::getCharacterNames()
+{
+    std::vector<std::string> names;
+
+    const char* sql =
+        "SELECT name FROM character ORDER BY name;";
+
+    sqlite3_stmt* stmt = nullptr;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK)
+    {
+        while (sqlite3_step(stmt) == SQLITE_ROW)
+        {
+            names.push_back(
+                reinterpret_cast<const char*>(
+                    sqlite3_column_text(stmt, 0)
+                )
+            );
+        }
+    }
+
+    sqlite3_finalize(stmt);
+
+    return names;
+}
