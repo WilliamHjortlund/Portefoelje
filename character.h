@@ -3,7 +3,6 @@
 #include <string>
 #include <array>
 
-
 constexpr int MAX_MONSTERS = 4;
 
 class Character {
@@ -19,6 +18,9 @@ public:
     bool replaceMonster(int index, const Monster& monster);
     void removeDefeatedMonsters();
     void resetAllMonstersHp();
+
+    // NY
+    void clearMonsters();
 
     void printMonsters() const;
 
