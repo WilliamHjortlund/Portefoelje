@@ -25,6 +25,7 @@ public:
     
     StatusEffect getStatusEffect() const;
     bool hasStatusEffect(StatusEffect effect) const;
+    const std::vector<Item>& getItems() const;
 
 private:
     std::string name;

@@ -70,6 +70,10 @@ bool Monster::hasStatusEffect(StatusEffect effect) const {
     return getStatusEffect() == effect;
 }
 
+const std::vector<Item>& Monster::getItems() const {
+    return equippedItems;
+}
+
 void Monster::recalculateStats() {
     strength = baseStrength;
     maxHp = baseHp;

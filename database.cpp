@@ -26,7 +26,13 @@ bool Database::init()
         "character_name TEXT,"
         "name TEXT,"
         "hp INTEGER,"
-        "strength INTEGER);";
+        "strength INTEGER);"
+
+        "CREATE TABLE IF NOT EXISTS monster_item ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "character_name TEXT,"
+        "monster_name TEXT,"
+        "item_name TEXT);";
 
     char* errMsg = nullptr;
 
@@ -69,8 +75,20 @@ bool Database::saveCharacter(const Character& character)
             ");";
 
         sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg);
-    }
+    
+        for (const auto& item : monster->getItems())
+        {
+            std::string itemSql =
+                "INSERT INTO monster_item(character_name,monster_name,item_name)"
+                " VALUES('" +
+                character.getName() + "','" +
+                monster->getName() + "','" +
+                item.getName() +
+                "');";
 
+            sqlite3_exec(db, itemSql.c_str(), nullptr, nullptr, &errMsg);
+        }
+    }
     return true;
 }
 
