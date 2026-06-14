@@ -18,9 +18,9 @@ public:
     bool replaceMonster(int index, const Monster& monster);
     void removeDefeatedMonsters();
     void resetAllMonstersHp();
-
-    // NY
     void clearMonsters();
+
+    void setName(const std::string& newName);
 
     void printMonsters() const;
 

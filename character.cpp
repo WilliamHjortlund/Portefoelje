@@ -14,6 +14,11 @@ std::string Character::getName() const
     return name;
 }
 
+void Character::setName(const std::string& newName)
+{
+    name = newName;
+}
+
 int Character::getMonsterCount() const
 {
     return monsterCount;
