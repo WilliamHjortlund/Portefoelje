@@ -2,7 +2,11 @@
 #include <iostream>
 
 Character::Character(const std::string& name)
-    : name(name), monsterCount(0)
+    : name(name), 
+    monsterCount(0),
+    monstersDefeated(0), 
+    cavesCompleted(0), 
+    itemsCollected(0)
 {
     monsters[0] = Monster("Hest", 30, 5);
     monsters[1] = Monster("Hest", 30, 5);
@@ -81,7 +85,6 @@ void Character::resetAllMonstersHp()
     }
 }
 
-// NY FUNKTION
 void Character::clearMonsters()
 {
     monsterCount = 0;
@@ -97,4 +100,46 @@ void Character::printMonsters() const
         std::cout << "  " << (i + 1) << ". ";
         monsters[i].printStats();
     }
+}
+
+void Character::addMonsterDefeat()
+{
+    monstersDefeated++;
+}
+
+void Character::addCaveCompleted()
+{
+    cavesCompleted++;
+}
+
+void Character::addItemsCollected(int amount)
+{
+    itemsCollected += amount;
+}
+
+int Character::getMonstersDefeated() const
+{
+    return monstersDefeated;
+}
+
+int Character::getCavesCompleted() const
+{
+    return cavesCompleted;
+}
+
+int Character::getItemsCollected() const
+{
+    return itemsCollected;
+}
+
+void Character::printStatistics() const
+{
+    std::cout << "\n";
+    std::cout << "============================================\n";
+    std::cout << "               STATISTIK\n";
+    std::cout << "============================================\n";
+    std::cout << "Monstre besejret: " << monstersDefeated << "\n";
+    std::cout << "Grotter gennemført: " << cavesCompleted << "\n";
+    std::cout << "Items fundet:      " << itemsCollected << "\n";
+    std::cout << "============================================\n";
 }

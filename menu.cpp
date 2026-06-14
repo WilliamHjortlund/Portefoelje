@@ -114,18 +114,24 @@ void Menu::adventureLoop(Character& character) {
         character.printMonsters();
         std::cout << "\n  1. Kæmp mod en fjende\n";
         std::cout << "  2. Gå til grotte\n";
-        std::cout << "  3. Gem karakter\n";
-        std::cout << "  4. Forlad til hovedmenu\n";
+        std::cout << "  3. Se statistik\n";
+        std::cout << "  4. Gem karakter\n";
+        std::cout << "  5. Forlad til hovedmenu\n";
         printSeparator();
 
-        int choice = readInt("Valg: ", 1, 4);
+        int choice = readInt("Valg: ", 1, 5);
         
         if (choice == 3) {
-            saveCharacter(character);
+            character.printStatistics();
             continue;
         }
 
         if (choice == 4) {
+            saveCharacter(character);
+            continue;
+        }
+
+        if (choice == 5) {
             std::cout << "Du vender tilbage til hovedmenuen.\n";
             return;
         }
@@ -162,6 +168,7 @@ void Menu::adventureLoop(Character& character) {
 
             if (won) {
                 std::cout << "\nDu besejrede " << enemy.getName() << "!\n";
+                character.addMonsterDefeat();
                 enemy.resetHp();
                 offerCapturedMonster(character, enemy);
                 battleWon = true;
@@ -312,6 +319,7 @@ void Menu::caveAdventure(Character& character) {
 
             if (won) {
                 std::cout << "\n*** " << caveMonster.getName() << " er besejret! ***\n";
+                character.addMonsterDefeat();
                 enemyDefeated = true;
             } else {
                 std::cout << "\n*** Dit monster " << myMonster->getName() << " blev besejret. ***\n";
@@ -346,11 +354,13 @@ void Menu::caveAdventure(Character& character) {
     }
 
     std::cout << "\n*** Du besejrede alle monstre i grotten! ***\n";
+    character.addCaveCompleted();
     std::vector<Item> rewards = Caves::getItemReward();
     handleCaveReward(character, rewards);
 }
 
 void Menu::handleCaveReward(Character& character, const std::vector<Item>& rewards) {
+    character.addItemsCollected(rewards.size());
     printSeparator();
     std::cout << "\nDu fik følgende items fra grottekampen:\n";
     for (const auto& item : rewards) {

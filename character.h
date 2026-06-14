@@ -21,10 +21,22 @@ public:
     void clearMonsters();
 
     void setName(const std::string& newName);
+    void addMonsterDefeat();
+    void addCaveCompleted();
+    void addItemsCollected(int amount);
+
+    int getMonstersDefeated() const;
+    int getCavesCompleted() const;
+    int getItemsCollected() const;
+
+    void printStatistics() const;
 
     void printMonsters() const;
 
 private:
+    int monstersDefeated;
+    int cavesCompleted;
+    int itemsCollected;
     std::string name;
     std::array<Monster, MAX_MONSTERS> monsters;
     int monsterCount;
